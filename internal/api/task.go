@@ -132,6 +132,7 @@ func (a *API) GetTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a *API) UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	a.logger.Println("request: UpdateTaskHandler()")
+
 	var task db.Task
 
 	body, err := io.ReadAll(r.Body)
@@ -316,6 +317,5 @@ func calculateDate(date, repeat string) (*time.Time, error) {
 			now = parsedDate
 		}
 	}
-
 	return &now, nil
 }

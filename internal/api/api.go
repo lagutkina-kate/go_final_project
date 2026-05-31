@@ -176,10 +176,10 @@ func (a *API) Auth(next http.HandlerFunc) http.HandlerFunc {
 				if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 					return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 				}
-				return []byte(secret), nil // убедитесь, что secret - []byte
+				return []byte(secret), nil 
 			})
 			if err != nil {
-				fmt.Printf("Failed to parse token: %s\n", err)
+				http.Error(w, "Authentification required", http.StatusUnauthorized)
 				return
 			}
 
@@ -187,11 +187,13 @@ func (a *API) Auth(next http.HandlerFunc) http.HandlerFunc {
 				http.Error(w, "Authentification required", http.StatusUnauthorized)
 				return
 			}
+
 			claims, ok := jwtToken.Claims.(jwt.MapClaims)
 			if !ok {
 				http.Error(w, "Authentification required", http.StatusUnauthorized)
 				return
 			}
+
 			hash := claims["hash"].(string)
 			if hash == "" {
 				http.Error(w, "Authentification required", http.StatusUnauthorized)
@@ -206,8 +208,6 @@ func (a *API) Auth(next http.HandlerFunc) http.HandlerFunc {
 				http.Error(w, "Authentification required", http.StatusUnauthorized)
 				return
 			}
-			
-
 		}
 		next(w, r)
 	})

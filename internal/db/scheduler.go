@@ -35,7 +35,6 @@ func NewSchedulerRepo(dbFile string) (*SchedulerRepo, error) {
 	var db *sql.DB
 	db, err = sql.Open("sqlite", "scheduler.db")
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
@@ -87,7 +86,7 @@ func (s *SchedulerRepo) GetTasks(num int) (*Tasks, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close() // Важно закрыть rows!
+	defer rows.Close()
 
 	tasks := &Tasks{
 		Tasks: make([]*Task, 0),

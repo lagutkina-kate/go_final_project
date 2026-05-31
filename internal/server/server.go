@@ -20,10 +20,11 @@ func NewServer(log *log.Logger, port string, repo *db.SchedulerRepo, password st
 
 	router.Handle("/", http.FileServer(http.Dir("./web")))
 	router.HandleFunc("/api/nextdate", a.NextDateHandler)
+	router.HandleFunc("/api/signin", a.SigninHandler)
+
 	router.HandleFunc("/api/task", a.Auth(a.TaskHandler))
 	router.HandleFunc("/api/tasks", a.Auth(a.TasksHandler))
 	router.HandleFunc("/api/task/done", a.Auth(a.DoneTaskHandler))
-	router.HandleFunc("/api/signin", a.SigninHandler)
 
 	return &SchedulerServer{
 		Logger: log,
@@ -36,4 +37,3 @@ func NewServer(log *log.Logger, port string, repo *db.SchedulerRepo, password st
 			IdleTimeout:  15 * time.Second},
 		DB: repo}
 }
-
