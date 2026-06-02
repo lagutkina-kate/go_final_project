@@ -18,6 +18,4 @@ COPY --from=builder /app/go-final-project .
 COPY web ./web
 COPY scheduler.db .
 
-EXPOSE 7540
-
 CMD ["./go-final-project"]

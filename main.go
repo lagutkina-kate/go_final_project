@@ -30,7 +30,8 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
-
+	defer sr.CloseDB()
+	
 	server := server.NewServer(logger, port, sr, password)
 	err = server.Server.ListenAndServe()
 	if err != nil {

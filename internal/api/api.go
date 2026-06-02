@@ -71,7 +71,10 @@ func (a *API) NextDateHandler(w http.ResponseWriter, r *http.Request) {
 	a.logger.Printf("response: %v\n", nextDate)
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "%s", nextDate)
+	_, err = fmt.Fprintf(w, "%s", nextDate)
+	if err != nil{
+		a.logger.Printf("NextDateHandler() error: %v\n", err)
+	}
 }
 
 func (a *API) TaskHandler(w http.ResponseWriter, r *http.Request) {
@@ -90,6 +93,9 @@ func (a *API) TaskHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPut:
 		a.UpdateTaskHandler(w, r)
 		return
+	default:
+		a.WriteResponse(w, http.StatusMethodNotAllowed, "error", "method nit allowed")
+		return
 	}
 }
 
@@ -99,6 +105,9 @@ func (a *API) TasksHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		a.GetTasksHandler(w, r)
+		return
+	default:
+		a.WriteResponse(w, http.StatusMethodNotAllowed, "error", "method nit allowed")
 		return
 	}
 }

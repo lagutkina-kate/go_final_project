@@ -40,7 +40,10 @@ func NewSchedulerRepo(dbFile string) (*SchedulerRepo, error) {
 
 	sr := &SchedulerRepo{db: db}
 	if install {
-		sr.Init()
+		err = sr.Init()
+		if err != nil{
+			return nil, err
+		}
 	}
 	return sr, nil
 }
@@ -182,9 +185,9 @@ func (s *SchedulerRepo) GetTaskByID(id int) (*Task, error) {
 	return &task, nil
 }
 
-func (s *SchedulerRepo) UpdateTaskByID(t *Task) (error) {
+func (s *SchedulerRepo) UpdateTaskByID(t *Task) error {
 	row, err := s.db.Exec(
-		"UPDATE scheduler SET date = ?, title = ?, comment = ?, repeat = ? WHERE id = ?;", 
+		"UPDATE scheduler SET date = ?, title = ?, comment = ?, repeat = ? WHERE id = ?;",
 		t.Date, t.Title, t.Comment, t.Repeat, t.ID)
 	if err != nil {
 		return err
@@ -198,17 +201,17 @@ func (s *SchedulerRepo) UpdateTaskByID(t *Task) (error) {
 	if rowsAffected == 0 {
 		return fmt.Errorf("task not found")
 	}
-	
+
 	return nil
 }
 
-func (s *SchedulerRepo) DeleteTaskByID(id int) (error) {
+func (s *SchedulerRepo) DeleteTaskByID(id int) error {
 	row, err := s.db.Exec(
 		"DELETE FROM scheduler WHERE id = ?;", id)
 	if err != nil {
 		return err
 	}
-	
+
 	rowsAffected, err := row.RowsAffected()
 	if err != nil {
 		return err
@@ -217,6 +220,14 @@ func (s *SchedulerRepo) DeleteTaskByID(id int) (error) {
 	if rowsAffected == 0 {
 		return fmt.Errorf("task not found")
 	}
-	
+
+	return nil
+}
+
+func (s *SchedulerRepo) CloseDB() error {
+	err := s.db.Close()
+	if err != nil {
+		return err
+	}
 	return nil
 }
