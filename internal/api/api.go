@@ -5,11 +5,12 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"go-final-project/internal/db"
 	"io"
 	"log"
 	"net/http"
 	"time"
+
+	"go-final-project/internal/db"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -41,6 +42,11 @@ type Password struct {
 
 func (a *API) NextDateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+ 
+	if r.Method != http.MethodGet{
+		a.WriteResponse(w, http.StatusMethodNotAllowed, "error", "method not allowed")
+		return
+	}
 
 	// example: "/api/nextdate?now=<20060102>&date=<20060102>&repeat=<правило>"
 	paramNow := r.URL.Query().Get("now")
@@ -72,7 +78,7 @@ func (a *API) NextDateHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	_, err = fmt.Fprintf(w, "%s", nextDate)
-	if err != nil{
+	if err != nil {
 		a.logger.Printf("NextDateHandler() error: %v\n", err)
 	}
 }
@@ -94,7 +100,7 @@ func (a *API) TaskHandler(w http.ResponseWriter, r *http.Request) {
 		a.UpdateTaskHandler(w, r)
 		return
 	default:
-		a.WriteResponse(w, http.StatusMethodNotAllowed, "error", "method nit allowed")
+		a.WriteResponse(w, http.StatusMethodNotAllowed, "error", "method not allowed")
 		return
 	}
 }
@@ -107,7 +113,7 @@ func (a *API) TasksHandler(w http.ResponseWriter, r *http.Request) {
 		a.GetTasksHandler(w, r)
 		return
 	default:
-		a.WriteResponse(w, http.StatusMethodNotAllowed, "error", "method nit allowed")
+		a.WriteResponse(w, http.StatusMethodNotAllowed, "error", "method not allowed")
 		return
 	}
 }
@@ -131,7 +137,6 @@ func (a *API) SigninHandler(w http.ResponseWriter, r *http.Request) {
 		a.WriteResponse(w, http.StatusBadRequest, "error", err.Error())
 		return
 	}
-	defer r.Body.Close()
 
 	err = json.Unmarshal(body, &password)
 	if err != nil {
@@ -185,7 +190,7 @@ func (a *API) Auth(next http.HandlerFunc) http.HandlerFunc {
 				if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 					return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 				}
-				return []byte(secret), nil 
+				return []byte(secret), nil
 			})
 			if err != nil {
 				http.Error(w, "Authentification required", http.StatusUnauthorized)
@@ -213,7 +218,7 @@ func (a *API) Auth(next http.HandlerFunc) http.HandlerFunc {
 
 			expTime := time.Unix(int64(exp), 0)
 
-			if time.Now().After(expTime){
+			if time.Now().After(expTime) {
 				http.Error(w, "Authentification required", http.StatusUnauthorized)
 				return
 			}

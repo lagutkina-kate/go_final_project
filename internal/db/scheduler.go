@@ -1,11 +1,11 @@
 package db
 
 import (
-	_ "modernc.org/sqlite"
-
 	"database/sql"
 	"fmt"
 	"os"
+
+	_ "modernc.org/sqlite"
 )
 
 type SchedulerRepo struct {
@@ -41,7 +41,7 @@ func NewSchedulerRepo(dbFile string) (*SchedulerRepo, error) {
 	sr := &SchedulerRepo{db: db}
 	if install {
 		err = sr.Init()
-		if err != nil{
+		if err != nil {
 			return nil, err
 		}
 	}

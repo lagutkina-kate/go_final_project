@@ -1,11 +1,12 @@
 package server
 
 import (
-	"go-final-project/internal/api"
-	"go-final-project/internal/db"
 	"log"
 	"net/http"
 	"time"
+
+	"go-final-project/internal/api"
+	"go-final-project/internal/db"
 )
 
 type SchedulerServer struct {

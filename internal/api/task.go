@@ -3,16 +3,22 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"go-final-project/internal/db"
 	"io"
 	"net/http"
 	"strconv"
 	"time"
+
+	"go-final-project/internal/db"
 )
 
 const SearchLayout = "02.01.2006"
 
 func (a *API) addTaskHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		a.WriteResponse(w, http.StatusMethodNotAllowed, "error", "method not allowed")
+		return
+	}
+
 	a.logger.Println("request: addTaskHandler()")
 
 	var task db.Task
@@ -22,7 +28,6 @@ func (a *API) addTaskHandler(w http.ResponseWriter, r *http.Request) {
 		a.WriteResponse(w, http.StatusBadRequest, "error", err.Error())
 		return
 	}
-	defer r.Body.Close()
 
 	err = json.Unmarshal(body, &task)
 	if err != nil {
@@ -64,6 +69,11 @@ func (a *API) addTaskHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) GetTasksHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		a.WriteResponse(w, http.StatusMethodNotAllowed, "error", "method not allowed")
+		return
+	}
+
 	paramSearch := r.URL.Query().Get("search")
 
 	a.logger.Printf("request: GetTasksHandler() paramSearch: %v\n", paramSearch)
@@ -98,6 +108,11 @@ func (a *API) GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) GetTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		a.WriteResponse(w, http.StatusMethodNotAllowed, "error", "method not allowed")
+		return
+	}
+
 	paramID := r.URL.Query().Get("id")
 
 	a.logger.Printf("request: GetTaskByIDHandler() paramID: %v\n", paramID)
@@ -131,6 +146,11 @@ func (a *API) GetTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut {
+		a.WriteResponse(w, http.StatusMethodNotAllowed, "error", "method not allowed")
+		return
+	}
+
 	a.logger.Println("request: UpdateTaskHandler()")
 
 	var task db.Task
@@ -140,7 +160,6 @@ func (a *API) UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 		a.WriteResponse(w, http.StatusBadRequest, "error", err.Error())
 		return
 	}
-	defer r.Body.Close()
 
 	err = json.Unmarshal(body, &task)
 	if err != nil {
@@ -180,6 +199,11 @@ func (a *API) UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) DoneTaskHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		a.WriteResponse(w, http.StatusMethodNotAllowed, "error", "method not allowed")
+		return
+	}
+
 	paramID := r.URL.Query().Get("id")
 
 	a.logger.Printf("request: DoneTaskHandler() paramID: %v\n", paramID)
@@ -241,12 +265,17 @@ func (a *API) DoneTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.logger.Printf("response: %v\n", struct{}{})
-	
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(struct{}{})
 }
 
 func (a *API) DeleteTaskHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		a.WriteResponse(w, http.StatusMethodNotAllowed, "error", "method not allowed")
+		return
+	}
+
 	paramID := r.URL.Query().Get("id")
 
 	a.logger.Printf("request: DeleteTaskHandler() paramID: %v\n", paramID)
